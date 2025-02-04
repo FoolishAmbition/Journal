@@ -1,0 +1,52 @@
+I used this VBA script to quickly highlight cells, because back then my internship company needed to highlight mismatched figures from different softwares, so a team of assistants was required to highlight cells manually, and to highlight manually such as the action of right clicking a cell and clicking on the preferred color was inefficient. I made a keybind on my mouse (binding CTRL+G on side button) to bind highlight cell with the specific RGB color. I shared this with the team as the audit was within 3 days and we needed to cross-verify an entire database of about 40 thousand values and figures.
+We managed to do it a few hours before the deadline. I'm glad this short vba guide helped them out.
+
+This code will allow you to quickly highlight cells by using a macro
+
+
+                              STEPS ON HOW TO DO IT
+-------------------------------------------------------------------------
+Open the VBA Editor:
+
+Press Alt + F11 to open the Visual Basic for Applications (VBA) editor.
+
+Insert a Module:
+In the VBA editor, right-click on "VBAProject (Your Workbook Name)" in the left pane.
+Choose Insert -> Module to add a new module.
+Copy and Paste the Code:
+
+Copy the VBA code (e.g., the code for applying light green fill color).
+Paste the code into the newly created module.
+Close the VBA Editor:
+
+Close the VBA editor by clicking the "X" button or pressing
+
+----------------------------------------------------------------
+
+Sub ApplyLightGreenFillColor()
+    With Selection.Interior
+        .Color = RGB(146, 208, 80) ' RGB values for light green
+    End With
+End Sub
+
+----------------------------------------------------------------
+
+After inserting the VBA script, need bind keybinds for highlighting cell.
+
+You need to assign a Keyboard Shortcut to the Macro HOW?
+
+1) Open the Excel workbook that contains your macro.
+
+2) Press Alt + F8 to open the "Macro" dialog box.
+
+3) In the "Macro" dialog box, select the macro you want to run (e.g., ApplyLightGreenFillColor).
+
+4) Click the "Options" button.
+
+5) In the "Macro Options" dialog box, enter a letter (or number) in the "Shortcut key" field. For example, you can use "G" for "ApplyGreenFillColor" or any other available key.
+
+6) Click "OK" to close the "Macro Options" dialog box.
+
+7) Click "Cancel" to close the "Macro" dialog box.
+
+Click on a cell that you want to highlight, then afterwards you press the key, for example CTRL + G
