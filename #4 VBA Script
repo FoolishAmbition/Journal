@@ -1,0 +1,43 @@
+Context:
+This code was used back when the new payroll system generated a raw excel file where the insurance to the company did not include a totalsum at the end to payout to
+company as a whole and instead had each employee individual insurance. Calculating total insurance to be issued for each company wasted a lot of time since there were
+a lot of companies per payroll cycle. This helped payroll executives to save time on manual processes and work more important matters.
+
+Usage:
+1 - User selects a column
+
+2 - When the macro runs, an input box appears asking the user to select a column. The user selects Column A. Macro scans Column A from bottom to top
+
+3 - It looks for any cell that contains the word "Insurance" (case-insensitive). When "Insurance" is found, a new row is inserted below it.
+-------------------------------------------------------------------------------------------------------------------------------------
+Sub InsertRowBelow()
+    Dim i As Long
+    Dim xLast As Long
+    Dim xRng As Range
+    Dim xTxt As String
+
+    ' Store the current selection address
+    xTxt = Application.ActiveWindow.RangeSelection.Address
+    
+    ' Ask the user to select a column
+    Set xRng = Application.InputBox("Please select the column to check for specific text:", "Insert Row Below", xTxt, , , , , 8)
+    
+    ' Exit if no range is selected
+    If xRng Is Nothing Then Exit Sub
+
+    ' Ensure only one column is selected
+    If xRng.Columns.Count > 1 Then
+        MsgBox "Please select only one column.", vbExclamation, "Invalid Selection"
+        Exit Sub
+    End If
+
+    ' Find the last row in the selected column
+    xLast = xRng.Rows.Count
+
+    ' Loop from bottom to top to avoid shifting issues when inserting rows
+    For i = xLast To 1 Step -1
+        If InStr(1, xRng.Cells(i, 1).Value, "Insurance", vbTextCompare) > 0 Then
+            Rows(xRng.Cells(i + 1, 1).Row).Insert Shift:=xlDown
+        End If
+    Next
+End Sub
