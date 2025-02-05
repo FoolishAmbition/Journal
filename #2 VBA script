@@ -1,0 +1,36 @@
+This VBA and Excel formula will allow you to check whether the cell that you are looking at, exists in the driver/folder that you provide.
+I used this to check 3000 entries whether the correct file entry exists on the file directory on the company's internal files.
+This VBA script has saved me hours on time, and also completing my work early.
+-------------------------------------------------------------------
+Function FileExists(fileName As String) As Integer
+    Dim fso As Object
+    Dim folderPath As String
+    Dim filePath As String
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    folderPath = "K:\finance\Payroll Folder\MingShun\2-24\Changes to IR8A\Brown" ' Update this with your folder path
+    
+    If Right(folderPath, 1) <> "\" Then
+        folderPath = folderPath & "\"
+    End If
+    
+    filePath = folderPath & fileName & ".pdf"
+    
+    If fso.FileExists(filePath) Then
+        FileExists = 1 ' File exists
+    Else
+        FileExists = 0 ' File does not exist
+    End If
+    
+    Set fso = Nothing
+End Function
+
+----------------------------------------------------------------
+
+After you inserted the vba file, you insert a FORMULA EXCEL to target the cells
+
+=FileExists(B361) < THIS FORMULA EXCEL RIGHT HERE
+
+
+*Change the B361 to any cell that you want to check in the folder.
