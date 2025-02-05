@@ -1,0 +1,103 @@
+Context:
+This code was used when download raw excel, helping them to calculate sum of salary, CPF, statutory contributions, and many others when downloading raw excel file
+from the Payroll Software system. The code ensures that correct sum is added using workerID as an identifier, to prevent autosum of other workers while formatting the
+inserted row with decimal number formats and border styles.
+
+As Persolkelly, a MNC HR outsourcing company whom deals wth hundreds of thousands of employees in Singapore. During the end of every payroll cycle (start of every month)
+Payroll executives typically stay up till 3am to complete calculations for tens of thousands of clients. This VBA script that I created was shared throughout the entire
+payroll department not just Singapore branch but other branches overseas - helping them to save hours wasted on calculations.
+
+Overview:
+The macro processes a column of worker IDs (column G) from bottom to top.
+It inserts a new row whenever a change in worker ID is detected.
+It calculates the sum of values in columns O and Q for each worker.
+It places the calculated sums in the inserted row.
+It formats the inserted row with specific number formats and border styles.
+
+# (final vers) ADJUSTMENTS TO THE CODE, REMOVED ONE ADDITIONAL INSERT ROWS BELOW AUTOSUM.
+------------------------------------------------------------------
+
+Sub InsertRowsAndAutoSum()
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim currentWorker As String
+    Dim i As Long
+    Dim insertFlag As Boolean
+    Dim sumStartRow As Long
+    Dim sumEndRow As Long
+    Dim sumValueO As Double
+    Dim sumValueQ As Double
+    
+    ' Set the worksheet where your data is located (change "Sheet1" to the actual sheet name)
+    Set ws = ThisWorkbook.Sheets("Sheet1")
+    
+    ' Find the last row in column G (worker ID)
+    lastRow = ws.Cells(ws.Rows.Count, 7).End(xlUp).Row
+    
+    ' Initialize the currentWorker variable with the worker ID from the last row
+    currentWorker = ws.Cells(lastRow, 7).Value
+    insertFlag = False ' Flag to indicate whether to insert rows
+    
+    ' Loop through each row in reverse order (from the last row to the first row)
+    For i = lastRow To 2 Step -1
+        If ws.Cells(i, 7).Value <> currentWorker Then
+            ' If the worker ID is different, set the flag to insert rows
+            insertFlag = True
+            currentWorker = ws.Cells(i, 7).Value
+            
+            ' Calculate the sum start and end rows
+            sumStartRow = i + 1
+            sumEndRow = ws.Cells(i, 7).End(xlDown).Row
+            
+            ' Calculate the sum of values in columns O and Q for the current worker ID
+            sumValueO = Application.WorksheetFunction.Sum(ws.Range("O" & sumStartRow & ":O" & sumEndRow))
+            sumValueQ = Application.WorksheetFunction.Sum(ws.Range("Q" & sumStartRow & ":Q" & sumEndRow))
+            
+            ' Insert a row below the last row for the current worker ID and save the sum of values in columns O and Q
+            ws.Rows(sumEndRow + 1).Insert
+            ws.Cells(sumEndRow + 1, 15).Value = sumValueO
+            ws.Cells(sumEndRow + 1, 17).Value = sumValueQ
+            
+            ' Format the calculated sum cells (columns O and Q) to include thousand separator and two decimal places
+            ws.Cells(sumEndRow + 1, 15).NumberFormat = "#,##0.00"
+            ws.Cells(sumEndRow + 1, 17).NumberFormat = "#,##0.00"
+            
+            ' Add formatting to the calculated sum cells (columns O, P, and Q)
+            With ws.Range(ws.Cells(sumEndRow + 1, 15), ws.Cells(sumEndRow + 1, 17)).Borders
+                .LineStyle = xlContinuous
+                .Color = vbBlack
+                .Weight = xlThin
+                .Item(xlEdgeTop).LineStyle = xlContinuous
+                .Item(xlEdgeTop).Color = vbBlack
+                .Item(xlEdgeTop).Weight = xlThin
+                .Item(xlEdgeBottom).LineStyle = xlDouble
+                .Item(xlEdgeBottom).Color = vbBlack
+                .Item(xlEdgeBottom).Weight = xlThick
+                ' Remove side borders for columns O, P, and Q
+                .Item(xlEdgeLeft).LineStyle = xlNone
+                .Item(xlEdgeRight).LineStyle = xlNone
+            End With
+            
+            ' Remove borders for column P
+            With ws.Range(ws.Cells(sumEndRow + 1, 16), ws.Cells(sumEndRow + 1, 16)).Borders
+                .LineStyle = xlNone
+            End With
+            
+            ' Remove border on the right side of column O
+            With ws.Range(ws.Cells(sumEndRow + 1, 15), ws.Cells(sumEndRow + 1, 15)).Borders(xlEdgeRight)
+                .LineStyle = xlNone
+            End With
+            
+            ' Remove border on the left side of column Q
+            With ws.Range(ws.Cells(sumEndRow + 1, 17), ws.Cells(sumEndRow + 1, 17)).Borders(xlEdgeLeft)
+                .LineStyle = xlNone
+            End With
+            
+            ' Check if the flag is true and insert rows accordingly
+            If insertFlag Then
+                ws.Rows(i + 1).Resize(1).Insert shift:=xlDown
+                insertFlag = False ' Reset the flag after inserting rows
+            End If
+        End If
+    Next i
+End Sub
