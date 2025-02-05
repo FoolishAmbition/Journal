@@ -1,0 +1,84 @@
+-----------------------------------------------------------------------------------------------------
+PAST VERSIONS OF THE MACRO
+Only added 2 rows after different worker ID
+-----------------------------------------------------------------------------------------------------
+Sub InsertRowsBelow()
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim currentWorker As String
+    Dim i As Long
+
+    ' Set the worksheet where your data is located (change "Sheet1" to the actual sheet name)
+    Set ws = ThisWorkbook.Sheets("Sheet1")
+
+    ' Find the last row in column C (worker NAME)
+    lastRow = ws.Cells(ws.Rows.Count, 3).End(xlUp).Row
+
+    ' Initialize the currentWorker variable with the worker ID from the last row
+    currentWorker = ws.Cells(lastRow, 7).Value
+
+    ' Loop through each row in reverse order (from the last row to the first row)
+    For i = lastRow To 2 Step -1
+        If ws.Cells(i, 7).Value <> currentWorker Then
+            ' If the worker ID is different, insert two new rows below
+            ws.Rows(i + 1).Resize(2).Insert shift:=xlDown
+            currentWorker = ws.Cells(i, 3).Value
+        End If
+    Next i
+End Sub
+-----------------------------------------------------------------------------------------------------
+The InsertRowsAndAutoSum macro is used to group and summarize data by worker ID in Excel. 
+It detects changes in worker IDs (column G), calculates totals for each worker's values in columns O and Q, and inserts new rows to display these sums. 
+Additionally, it inserts extra blank rows for better readability.
+
+Usage:
+Identifies different workers in column G
+Calculates totals for columns O (15) and Q (17) per worker
+Inserts new rows to display these sums
+Adds extra blank rows for better data separation
+-----------------------------------------------------------------------------------------------------
+Sub InsertRowsAndAutoSum()
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim currentWorker As String
+    Dim i As Long
+    Dim insertFlag As Boolean
+    Dim sumStartRow As Long
+    Dim sumEndRow As Long
+    Dim sumValueO As Double
+    Dim sumValueQ As Double
+    
+    ' Set the worksheet where your data is located (change "Sheet1" to the actual sheet name)
+    Set ws = ThisWorkbook.Sheets("Sheet1")
+    
+    ' Find the last row in column G (worker ID)
+    lastRow = ws.Cells(ws.Rows.Count, 7).End(xlUp).Row
+    
+    ' Initialize the currentWorker variable with the worker ID from the last row
+    currentWorker = ws.Cells(lastRow, 7).Value
+    insertFlag = False ' Flag to indicate whether to insert rows
+    
+    ' Loop through each row in reverse order (from the last row to the first row)
+    For i = lastRow To 2 Step -1
+        If ws.Cells(i, 7).Value <> currentWorker Then
+            ' If the worker ID is different, set the flag to insert rows
+            insertFlag = True
+            currentWorker = ws.Cells(i, 7).Value
+            
+            ' Calculate the sum start and end rows
+            sumStartRow = i + 1
+            sumEndRow = ws.Cells(i, 7).End(xlDown).Row
+            
+            ' Calculate the sum of values in columns O and Q for the current worker ID
+            sumValueO = Application.WorksheetFunction.Sum(ws.Range("O" & sumStartRow & ":O" & sumEndRow))
+            sumValueQ = Application.WorksheetFunction.Sum(ws.Range("Q" & sumStartRow & ":Q" & sumEndRow))
+            
+            ' Insert a row below the last row for the current worker ID and save the sum of values in columns O and Q
+            ws.Rows(sumEndRow + 1).Insert
+            ws.Cells(sumEndRow + 1, 15).Value = sumValueO
+            ws.Cells(sumEndRow + 1, 17).Value = sumValueQ
+        End If
+        
+        ' Check if the flag is true and insert rows accordingly
+        If insertFlag Then
+            ws.Rows(i + 1).Resize(2).Insert shift:=xlDown
