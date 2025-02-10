@@ -12,4 +12,10 @@ for traffic_cycle_count in range(10):
     traffic_light = colors[traffic_cycle_count % len(colors)]
     print(f"Traffic {traffic_cycle_count} is {traffic_light}")
 
-#learning round-robin scheduling, a fair distribution for tasks designation , examples include call centers, 
+#learning round-robin scheduling, a fair distribution for tasks designation , examples include cpu scheduling, load balancing in web servers
+processes = ["Process A", "Process B", "Process C"]
+time_slices = 10  # Simulating 10 time slots
+
+for i in range(time_slices):
+    current_process = processes[i % len(processes)]
+    print(f"Time slice {i}: Running {current_process}")
