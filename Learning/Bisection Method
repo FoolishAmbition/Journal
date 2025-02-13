@@ -1,38 +1,61 @@
 def square_root_bisection(square_target, tolerance=1e-7, max_iterations=100):
+    """
+    Compute the square root of a non-negative number using the bisection method.
+    
+    Parameters:
+        square_target (float): The number whose square root is to be computed.
+        tolerance (float): The acceptable error between the square of the computed
+                           root and the target value.
+        max_iterations (int): Maximum number of iterations allowed before giving up.
+    
+    Returns:
+        float: The approximated square root of square_target.
+    
+    Raises:
+        ValueError: If square_target is negative.
+    """
+    # Check for negative input; square root for negative numbers is undefined in real numbers.
     if square_target < 0:
         raise ValueError('Square root of negative number is not defined in real numbers')
+    
+    # Handle trivial cases for 0 and 1 immediately.
     if square_target == 1:
         root = 1
         print(f'The square root of {square_target} is 1')
     elif square_target == 0:
         root = 0
         print(f'The square root of {square_target} is 0')
-
     else:
+        # For other values, set the initial search interval:
+        # low starts at 0 and high is the maximum of 1 and the target (covers cases where target < 1)
         low = 0
         high = max(1, square_target)
-        root = None
+        root = None  # Initialize root as None; it will be updated once the approximation converges
         
+        # Perform the bisection loop up to max_iterations times
         for _ in range(max_iterations):
-            mid = (low + high) / 2
-            square_mid = mid**2
+            mid = (low + high) / 2      # Compute the midpoint of the current interval
+            square_mid = mid ** 2       # Square the midpoint to compare with the target
 
+            # Check if the squared midpoint is close enough to the target within the tolerance
             if abs(square_mid - square_target) < tolerance:
-                root = mid
+                root = mid            # Accept mid as the root
                 break
-
+            # If the square is less than the target, move the lower bound up
             elif square_mid < square_target:
                 low = mid
+            # Otherwise, the square is greater than the target, so move the upper bound down
             else:
                 high = mid
 
+        # If the root was never updated (i.e., convergence wasn't reached), notify the user
         if root is None:
             print(f"Failed to converge within {max_iterations} iterations.")
-    
-        else:   
+        else:
             print(f'The square root of {square_target} is approximately {root}')
     
     return root
 
+# Example usage:
 N = 64
 square_root_bisection(N)
