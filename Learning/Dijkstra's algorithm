@@ -1,0 +1,66 @@
+# Weighted graph representation using adjacency lists
+# Format: {Node: [(Neighbor1, weight), (Neighbor2, weight), ...]}
+my_graph = {
+    'A': [('B', 5), ('C', 3), ('E', 11)],
+    'B': [('A', 5), ('C', 1), ('F', 2)],
+    'C': [('A', 3), ('B', 1), ('D', 1), ('E', 5)],
+    'D': [('C',1 ), ('E', 9), ('F', 3)],
+    'E': [('A', 11), ('C', 5), ('D', 9)],
+    'F': [('B', 2), ('D', 3)]
+}
+
+def shortest_path(graph, start, target=''):
+    """
+    Dijkstra's algorithm implementation for finding shortest paths in a weighted graph.
+    
+    Args:
+        graph: Dictionary representing the weighted graph
+        start: Starting node for path calculation
+        target: Optional target node (shows only this path if specified)
+    
+    Returns:
+        Tuple of (distances, paths) dictionaries
+    """
+    
+    # Initialize data structures
+    unvisited = list(graph)  # Nodes to process
+    distances = {node: 0 if node == start else float('inf') for node in graph}  # Shortest known distances
+    paths = {node: [] for node in graph}  # Shortest paths
+    paths[start].append(start)  # Path to start is itself
+    
+    # Main Dijkstra's algorithm loop
+    while unvisited:
+        # Select the unvisited node with smallest known distance
+        current = min(unvisited, key=distances.get)
+        
+        # Explore all neighbors of current node
+        for node, distance in graph[current]:
+            # Calculate tentative distance
+            new_distance = distance + distances[current]
+            
+            # Relaxation step - update if better path found
+            if new_distance < distances[node]:
+                distances[node] = new_distance
+                
+                # Update path (handling path copying to avoid reference issues)
+                if paths[node] and paths[node][-1] == node:
+                    paths[node] = paths[current][:]  # Create copy to prevent reference sharing
+                else:
+                    paths[node].extend(paths[current])  # Extend existing path
+                paths[node].append(node)  # Add current node to path
+        
+        unvisited.remove(current)  # Mark as visited
+    
+    # Prepare output based on target specification
+    targets_to_print = [target] if target else graph
+    
+    # Print results for requested nodes
+    for node in targets_to_print:
+        if node == start:
+            continue  # Skip start node in output
+        print(f'\n{start}-{node} distance: {distances[node]}\nPath: {" -> ".join(paths[node])}')
+    
+    return distances, paths  # Return full data for programmatic use
+
+# Example usage
+shortest_path(my_graph, 'A', 'F')
