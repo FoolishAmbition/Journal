@@ -1,0 +1,79 @@
+def add_time(start_time, duration, start_day=None):
+    # 1. Parsing the Input Time (start time, duration, start_day)
+    time_part, period = start_time.split()
+    hours, minutes = map(int, time_part.split(':'))
+		
+    # 1. Parsing the Input Time (Convert to 24 hours format)
+    if period == 'PM' and hours != 12:
+        hours += 12
+    elif period == 'AM' and hours == 12:
+        hours = 0
+    start_total = hours * 60 + minutes	
+    '''
+    print('start_total')
+    
+    print(
+        f"Input: {start_time}\n"
+        f"Split into time_part: {time_part} | Period: {period}\n"
+        f"Extracted time: {time_extraction} → Hours: {hours}, Minutes: {minutes}"
+    )
+    '''
+	
+    # 2. Parsing the Duration
+    time_extraction2 = duration.split(":")
+    duration_hours = int(time_extraction2[0])
+    duration_minutes = int(time_extraction2[1])
+    duration_total = (duration_hours * 60) + duration_minutes
+    			
+    # 3. Performing the Time Addition
+    new_total = start_total + duration_total
+    new_hours = (new_total // 60) % 24  # Handle 24-hour overflow
+    new_minutes = new_total % 60
+	
+    # 4. Determining Days Later
+    new_day = new_total // (24 * 60) # Determine how many days has passed
+    remaining_hours = new_total % 24 # How many hours left over
+    
+    '''
+    print(f'Total minutes: {new_total}, '
+          f'Hours: {new_hours}, '
+          f'Minutes: {new_minutes}, '
+          f'Days passed: {new_day} '
+          f'Hours left over: {remaining_hours}')
+    '''
+    	
+    # 5. Handling the Day of Week
+    days_of_the_week = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
+    start_day_lower = start_day.lower()
+    current_position = days_of_the_week.index(start_day_lower) 
+    
+    if new_day >= 1:
+        new_position = (new_day + current_position) % 7
+        new_day_name = days_of_the_week[new_position].capitalize()
+        days_text = f", {new_day_name}"
+        if new_day == 1:
+            days_text += " (next day)"
+        else:
+            days_text += f" ({new_day} days later)"
+    else: 
+        days_text = ""
+	
+    # Displaying the hours, time, and new days
+    if new_hours == 0:
+        display_hours = 12
+        period = "AM"
+    elif new_hours < 12:
+        display_hours = new_hours
+        period = "AM"
+    elif new_hours == 12:
+        display_hours = new_hours
+        period = "PM"
+    else:
+        display_hours = new_hours - 12
+        period = "PM"
+
+    return f"{display_hours}:{new_minutes:02d} {period}{days_text}"
+	
+print(add_time('3:45 PM', '3:10', 'Saturday'))  # Output: 6:55 PM, Saturday
+print(add_time('11:45 PM', '25:10', 'Saturday'))  # Output: 1:55 AM, Sunday (next day)
+print(add_time('8:16 PM', '466:02', 'Tuesday'))  # Output: 6:18 AM, Monday (20 days later)
